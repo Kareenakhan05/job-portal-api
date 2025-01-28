@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const userSchema = new mongoose.Schema({
+const user_schema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
@@ -36,11 +36,11 @@ const userSchema = new mongoose.Schema({
     resume: { // This stores the path or URL for the resume file
         type: String,
     },
-    profilePicture: { // This stores the path or URL for the profile photo
+    profile_picture: { // This stores the path or URL for the profile photo
         type: String,
     },
 }, { timestamps: true });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('User', user_schema);
 
 export default User;

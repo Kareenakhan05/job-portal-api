@@ -1,76 +1,91 @@
+import { check, validationResult } from 'express-validator';
 import User from '../models/user.js';
-import { comparePassword, hashPassword } from '../services/authService.js';
-import { uploadProfilePhoto, uploadResume } from '../services/fileUploadService.js';
+import { generate_token, hash_password, compare_password } from '../services/authService.js';
+import { upload_profile_photo, upload_resume } from '../services/fileUploadService.js';
+
+// Helper Function for Standardized Responses
+const sendResponse = (res, status, message, data = null) => {
+    return res.status(status).json({
+        message,
+        data
+    });
+};
 
 // Create Profile
-export async function createProfile(req, res) {
+export async function create_profile(req, res) {
     try {
+        // Validate incoming data
+        const validationErrors = validationResult(req);
+        if (!validationErrors.isEmpty()) {
+            return sendResponse(res, 400, 'Validation error', validationErrors.array());
+        }
+
         const { email, name, phone, address, bio } = req.body;
 
         const existingUser = await User.findOne({ email });
-        if (existingUser) return res.status(400).json({ message: 'Profile already exists' });
+        if (existingUser) return sendResponse(res, 400, 'Profile already exists');
 
         const user = new User({ email, name, phone, address, bio });
         await user.save();
 
-        res.status(201).json({ message: 'Profile created successfully', user });
+        sendResponse(res, 201, 'Profile created successfully', user);
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
 
 // Get Profile
-export async function getProfile(req, res) {
+export async function get_profile(req, res) {
     try {
         const { email } = req.params;
 
         const user = await User.findOne({ email }).select('-password');
-        if (!user) return res.status(404).json({ message: 'Profile not found' });
+        if (!user) return sendResponse(res, 404, 'Profile not found');
 
-        res.status(200).json({ message: 'Profile retrieved successfully', user });
+        sendResponse(res, 200, 'Profile retrieved successfully', user);
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
 
 // Update Profile
-export async function updateProfile(req, res) {
+export async function update_profile(req, res) {
     try {
         const { email } = req.params;
         const updates = req.body;
 
         const user = await User.findOneAndUpdate({ email }, updates, { new: true });
-        if (!user) return res.status(404).json({ message: 'Profile not found' });
+        if (!user) return sendResponse(res, 404, 'Profile not found');
 
-        res.status(200).json({ message: 'Profile updated successfully', user });
+        sendResponse(res, 200, 'Profile updated successfully', user);
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
 
 // Change Password
-export async function changePassword(req, res) {
+export async function change_password(req, res) {
     try {
-        const { email, currentPassword, newPassword } = req.body;
+        const { email, current_password, new_password } = req.body;
 
         const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (!user) return sendResponse(res, 404, 'User not found');
 
-        const isMatch = await comparePassword(currentPassword, user.password);
-        if (!isMatch) return res.status(400).json({ message: 'Current password is incorrect' });
+        const isMatch = await comparePassword(current_password, user.password);
+        if (!isMatch) return sendResponse(res, 400, 'Current password is incorrect');
 
-        const hashedPassword = await hashPassword(newPassword);
+        const hashedPassword = await hashPassword(new_password);
         user.password = hashedPassword;
         await user.save();
 
-        res.status(200).json({ message: 'Password changed successfully' });
+        sendResponse(res, 200, 'Password changed successfully');
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
 
 // Create or Update Profile (Upsert)
-export async function upsertProfile(req, res) {
+export async function upsert_profile(req, res) {
     try {
         const { id } = req.user; // Assuming the user ID is available from the token
         const { skills, experience, qualification, bio } = req.body;
@@ -81,107 +96,112 @@ export async function upsertProfile(req, res) {
             { new: true, upsert: true }
         );
 
-        res.status(200).json({ message: 'Profile updated successfully', profile: user });
+        sendResponse(res, 200, 'Profile updated successfully', user);
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
 
 // Get Profile by ID
-export async function getProfileById(req, res) {
+export async function get_profile_by_id(req, res) {
     try {
-        const { userId } = req.params;
+        const { user_id } = req.params;
 
-        const user = await User.findById(userId).select('-password');
-        if (!user) return res.status(404).json({ message: 'Profile not found' });
+        const user = await User.findById(user_id).select('-password');
+        if (!user) return sendResponse(res, 404, 'Profile not found');
 
-        res.status(200).json({ message: 'Profile retrieved successfully', profile: user });
+        sendResponse(res, 200, 'Profile retrieved successfully', user);
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
 
 // Upload Profile Picture
-export async function uploadProfilePhotoController(req, res) {
+export async function upload_profile_photo_controller(req, res) {
     try {
-        const userId = req.user.id;  // Assuming authentication middleware is applied and user ID is available from the token
+        const user_id = req.user.id; // Assuming authentication middleware is applied
         const file = req.file;
 
         if (!file) {
-            return res.status(400).json({ message: 'No file uploaded' });
+            return sendResponse(res, 400, 'No file uploaded');
         }
 
         // Find the user
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        const user = await User.findById(user_id);
+        if (!user) return sendResponse(res, 404, 'User not found');
 
-        // Delete the old profile picture if it exists (optional)
-        if (user.profilePicture) {
-            // Optionally, delete the old profile picture from file system or cloud storage
+        // Optionally delete old profile picture
+        if (user.profile_picture) {
+            // Delete old profile picture logic
         }
 
-        // Save the new profile picture path in the database
-        user.profilePicture = file.path;  // Store the file path or URL
+        user.profile_picture = file.path;
         await user.save();
 
-        res.status(200).json({ message: 'Profile photo uploaded successfully', profilePicture: user.profilePicture });
+        sendResponse(res, 200, 'Profile photo uploaded successfully', user.profile_picture);
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
 
 // Upload Resume
-export async function uploadResumeController(req, res) {
+export async function upload_resume_controller(req, res) {
     try {
-        const userId = req.user.id;  // Assuming authentication middleware is applied and user ID is available from the token
+        const user_id = req.user.id;
         const file = req.file;
 
         if (!file) {
-            return res.status(400).json({ message: 'No file uploaded' });
+            return sendResponse(res, 400, 'No file uploaded');
         }
 
-        // Find the user
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        const user = await User.findById(user_id);
+        if (!user) return sendResponse(res, 404, 'User not found');
 
-        // Save the new resume path in the database
-        user.resume = file.path;  // Store the file path or URL
+        user.resume = file.path;
         await user.save();
 
-        res.status(200).json({ message: 'Resume uploaded successfully', resume: user.resume });
+        sendResponse(res, 200, 'Resume uploaded successfully', user.resume);
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
 
 // Get Profile Photo
-export async function getProfilePhoto(req, res) {
+export async function get_profile_photo(req, res) {
     try {
-        const { userId } = req.params;
+        const { user_id } = req.params;
 
-        const user = await User.findById(userId).select('profilePicture');
-        if (!user || !user.profilePicture) {
-            return res.status(404).json({ message: 'Profile photo not found' });
+        const user = await User.findById(user_id).select('profile_picture');
+        if (!user || !user.profile_picture) {
+            return sendResponse(res, 404, 'Profile photo not found');
         }
 
-        res.status(200).json({ message: 'Profile photo retrieved successfully', profilePicture: user.profilePicture });
+        sendResponse(res, 200, 'Profile photo retrieved successfully', user.profile_picture);
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
 
 // Get Resume
-export async function getResume(req, res) {
+export async function get_resume(req, res) {
     try {
-        const { userId } = req.params;
+        const { user_id } = req.params;
 
-        const user = await User.findById(userId).select('resume');
+        const user = await User.findById(user_id).select('resume');
         if (!user || !user.resume) {
-            return res.status(404).json({ message: 'Resume not found' });
+            return sendResponse(res, 404, 'Resume not found');
         }
 
-        res.status(200).json({ message: 'Resume retrieved successfully', resume: user.resume });
+        sendResponse(res, 200, 'Resume retrieved successfully', user.resume);
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
+
+// Validation Middleware (using express-validator)
+export const validateCreateUser = [
+    check('first_name').notEmpty().withMessage('First name is required'),
+    check('last_name').notEmpty().withMessage('Last name is required'),
+    check('email').isEmail().withMessage('Invalid email format'),
+    check('password').isLength({ min: 6 }).withMessage('Password should be at least 6 characters')
+];

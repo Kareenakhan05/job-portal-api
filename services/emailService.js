@@ -1,15 +1,16 @@
 import nodemailer from 'nodemailer';
 
-export default async function sendEmail(to, subject, text) {
+export default async function send_email(to, subject, text) {
     // Ensure necessary environment variables are set
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.error('ERROR: Missing EMAIL_USER or EMAIL_PASS in environment variables');
-        throw new Error('Missing EMAIL_USER or EMAIL_PASS in environment variables');
+        const errorMessage = 'ERROR: Missing EMAIL_USER or EMAIL_PASS in environment variables';
+        console.error(errorMessage);
+        throw new Error(errorMessage);
     }
 
     // Create reusable transporter object using SMTP transport
     const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: 'gmail', 
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
@@ -30,7 +31,8 @@ export default async function sendEmail(to, subject, text) {
         console.log('Email sent successfully:', info.response);
     } catch (err) {
         // Log error details
-        console.error('Email send failed:', err);
+        const errorMessage = `ERROR: Failed to send email. Error: ${err.message}`;
+        console.error(errorMessage);
         throw new Error('Failed to send email. Please try again later.');
     }
 }

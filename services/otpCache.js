@@ -1,42 +1,42 @@
 import pkg from 'lru-cache';
 const { default: LRU } = pkg;
 
-// Initialize the LRU cache
-const otpCache = new LRU({
+// Initialize the LRU cache with a max size and TTL (time-to-live)
+const otp_cache = new LRU({
     max: 100, // Maximum items in cache
-    ttl: 1000 * 60 * 5, // Cache expiry time (5 minutes)
+    ttl: 1000 * 60 * 5, // Cache expiry time of 5 minutes
 });
 
 // Store OTP in cache
-export function storeOtp(email, otp) {
+export function store_otp(email, otp) {
     try {
-        otpCache.set(email, otp);
+        otp_cache.set(email, otp);
     } catch (err) {
-        console.error('Error storing OTP:', err);
-        throw new Error('Failed to store OTP. Please try again.');
+        console.error(`Error storing OTP for ${email}:`, err);
+        throw new Error('Failed to store OTP. Please try again later.');
     }
 }
 
 // Get OTP from cache
-export function getOtp(email) {
+export function get_otp(email) {
     try {
-        const otp = otpCache.get(email);
+        const otp = otp_cache.get(email);
         if (!otp) {
             throw new Error('OTP not found or expired');
         }
         return otp;
     } catch (err) {
-        console.error('Error retrieving OTP:', err);
-        throw new Error('Failed to retrieve OTP. Please try again.');
+        console.error(`Error retrieving OTP for ${email}:`, err);
+        throw new Error('Failed to retrieve OTP. Please try again later.');
     }
 }
 
 // Delete OTP from cache
-export function deleteOtp(email) {
+export function delete_otp(email) {
     try {
-        otpCache.delete(email);
+        otp_cache.delete(email);
     } catch (err) {
-        console.error('Error deleting OTP:', err);
-        throw new Error('Failed to delete OTP. Please try again.');
+        console.error(`Error deleting OTP for ${email}:`, err);
+        throw new Error('Failed to delete OTP. Please try again later.');
     }
 }

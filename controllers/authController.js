@@ -1,20 +1,40 @@
+import { check, validationResult } from 'express-validator';
 import User from '../models/user.js';
-import { generateToken, hashPassword, comparePassword } from '../services/authService.js';
+import {  generate_token, hash_password, compare_password } from '../services/authService.js';
 import sendEmail from '../services/emailService.js';
+
+// Helper Function for Standardized Responses
+const sendResponse = (res, status, message, data = null) => {
+    return res.status(status).json({
+        message,
+        data
+    });
+};
+
+// Helper Function for OTP Generation
+const generateOtp = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+};
 
 // Register with OTP
 export async function register(req, res) {
     try {
         const { email, name, phone, role, password } = req.body;
 
+        // Validate incoming data
+        const validationErrors = validationResult(req);
+        if (!validationErrors.isEmpty()) {
+            return sendResponse(res, 400, 'Validation error', validationErrors.array());
+        }
+
         if (!password) {
-            return res.status(400).json({ message: 'Password is required for registration' });
+            return sendResponse(res, 400, 'Password is required for registration');
         }
 
         const existingUser = await User.findOne({ email });
-        if (existingUser) return res.status(400).json({ message: 'Email already registered' });
+        if (existingUser) return sendResponse(res, 400, 'Email already registered');
 
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otp = generateOtp();
         const otpExpiry = Date.now() + 10 * 60 * 1000;
 
         const user = new User({ email, name, phone, role, otp, otpExpiry, password });
@@ -22,20 +42,20 @@ export async function register(req, res) {
 
         // Send OTP to email
         await sendEmail(email, 'OTP for Job Portal Registration', `Your OTP is ${otp}`);
-        res.status(200).json({ message: 'OTP sent to your email. Verify to complete registration.' });
+        sendResponse(res, 200, 'OTP sent to your email. Verify to complete registration.');
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
 
 // Verify OTP for Registration
-export async function verifyRegistrationOtp(req, res) {
+export async function verify_registration_otp(req, res) {
     try {
         const { email, otp, password } = req.body;
 
         const user = await User.findOne({ email });
         if (!user || user.otp !== otp || user.otpExpiry < Date.now()) {
-            return res.status(400).json({ message: 'Invalid or expired OTP' });
+            return sendResponse(res, 400, 'Invalid or expired OTP');
         }
 
         // Hash the password and set user as verified
@@ -45,9 +65,9 @@ export async function verifyRegistrationOtp(req, res) {
         user.otpExpiry = null;
         await user.save();
 
-        res.status(200).json({ message: 'Registration successful. You can now log in.' });
+        sendResponse(res, 200, 'Registration successful. You can now log in.');
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
 
@@ -57,73 +77,96 @@ export async function login(req, res) {
         const { email, password } = req.body;
 
         const user = await User.findOne({ email });
-        if (!user || !user.isVerified) return res.status(404).json({ message: 'User not found or not verified' });
+        if (!user || !user.isVerified) return sendResponse(res, 404, 'User not found or not verified');
 
         const isMatch = await comparePassword(password, user.password);
-        if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
+        if (!isMatch) return sendResponse(res, 401, 'Invalid credentials');
 
         const token = generateToken(user);
-        res.status(200).json({ message: 'Login successful', token });
+        sendResponse(res, 200, 'Login successful', { token });
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
 
 // Forgot Password
-export async function forgotPassword(req, res) {
+export async function forgot_password(req, res) {
     try {
         const { email } = req.body;
 
         const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (!user) return sendResponse(res, 404, 'User not found');
 
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otp = generateOtp();
         user.otp = otp;
         user.otpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes expiry
         await user.save();
 
         // Send OTP to email
         await sendEmail(email, 'Password Reset OTP', `Your OTP is ${otp}`);
-        res.status(200).json({ message: 'OTP sent to email' });
+        sendResponse(res, 200, 'OTP sent to email');
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
 
 // Verify OTP for Password Reset
-export async function verifyOtp(req, res) {
+export async function verify_otp(req, res) {
     try {
         const { email, otp } = req.body;
 
         const user = await User.findOne({ email });
         if (!user || user.otp !== otp || user.otpExpiry < Date.now()) {
-            return res.status(400).json({ message: 'Invalid or expired OTP' });
+            return sendResponse(res, 400, 'Invalid or expired OTP');
         }
 
         user.otp = null;
         user.otpExpiry = null;
         await user.save();
 
-        res.status(200).json({ message: 'OTP verified successfully' });
+        sendResponse(res, 200, 'OTP verified successfully');
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
 
 // Reset Password
-export async function resetPassword(req, res) {
+export async function reset_password(req, res) {
     try {
-        const { email, newPassword } = req.body;
+        const { email, new_password } = req.body;
 
         const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (!user) return sendResponse(res, 404, 'User not found');
 
-        const hashedPassword = await hashPassword(newPassword);
+        const hashedPassword = await hashPassword(new_password);
         user.password = hashedPassword;
         await user.save();
 
-        res.status(200).json({ message: 'Password reset successfully' });
+        sendResponse(res, 200, 'Password reset successfully');
     } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+        sendResponse(res, 500, 'Server error', err.message);
     }
 }
+
+// Validation Middleware (using express-validator)
+export const validateRegisterUser = [
+    check('name').notEmpty().withMessage('Name is required'),
+    check('email').isEmail().withMessage('Invalid email format'),
+    check('phone').notEmpty().withMessage('Phone number is required'),
+    check('role').notEmpty().withMessage('Role is required'),
+    check('password').isLength({ min: 6 }).withMessage('Password should be at least 6 characters')
+];
+
+export const validateLogin = [
+    check('email').isEmail().withMessage('Invalid email format'),
+    check('password').isLength({ min: 6 }).withMessage('Password should be at least 6 characters')
+];
+
+export const validateForgotPassword = [
+    check('email').isEmail().withMessage('Invalid email format')
+];
+
+export const validateResetPassword = [
+    check('email').isEmail().withMessage('Invalid email format'),
+    check('new_password').isLength({ min: 6 }).withMessage('Password should be at least 6 characters')
+];
