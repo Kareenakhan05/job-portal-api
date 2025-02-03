@@ -1,15 +1,15 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import connectDB from './database/db.js';
-import userRoutes from './routes/userRoutes.js';
-import profileRoutes from './routes/profileRoutes.js';
-import jobRoutes from './routes/jobRoutes.js';
-import recruiterRoutes from './routes/recruiterRoutes.js';
-import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
-import { errorHandler } from './middlewares/errorHandler.js';
-import responseMiddleware from './middlewares/responseMiddleware.js'; // Response middleware import
+const express = require('express');
+const dotenv = require('dotenv');
+const connectDB = require('./database/db');  // Assuming db.js is in the database folder
+const userRoutes = require('./routes/userRoutes');  // User routes
+const profileRoutes = require('./routes/profileRoutes');  // Profile routes
+const jobRoutes = require('./routes/jobRoutes');  // Job routes
+const recruiterRoutes = require('./routes/recruiterRoutes');  // Recruiter routes
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const { errorHandler } = require('./middlewares/errorHandler');
+const responseMiddleware = require('./middlewares/responseMiddleware'); // Response middleware
 
 dotenv.config();
 
@@ -33,11 +33,11 @@ app.use(responseMiddleware); // This middleware will now handle response structu
 // Connect to the database
 connectDB();
 
-// Routes
-app.use('/api/user', userRoutes);
-app.use('/api/profile', profileRoutes);
-app.use('/api/jobs', jobRoutes);
-app.use('/api/recruiter', recruiterRoutes);
+// Routes for different APIs
+app.use('/api/user', userRoutes);  // User-specific APIs
+app.use('/api/profile', profileRoutes);  // Profile APIs
+app.use('/api/jobs', jobRoutes);  // Job-related APIs
+app.use('/api/recruiter', recruiterRoutes);  // Recruiter APIs
 
 // Centralized Error Handling Middleware
 app.use(errorHandler);
