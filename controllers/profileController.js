@@ -1,18 +1,11 @@
-import { check, validationResult } from 'express-validator';
-import User from '../models/user.js';
-import { generate_token, hash_password, compare_password } from '../services/authService.js';
-import { upload_profile_photo, upload_resume } from '../services/fileUploadService.js';
-
-// Helper Function for Standardized Responses
-const sendResponse = (res, status, message, data = null) => {
-    return res.status(status).json({
-        message,
-        data
-    });
-};
+const { validationResult } = require('express-validator');
+const User = require('../models/user');
+const { generate_token, hash_password, compare_password } = require('../services/authService');
+const { upload_profile_photo, upload_resume } = require('../services/fileUploadService');
+const { sendResponse } = require('../middlewares/responseMiddleware');
 
 // Create Profile
-export async function create_profile(req, res) {
+const create_profile = async (req, res) => {
     try {
         // Validate incoming data
         const validationErrors = validationResult(req);
@@ -32,10 +25,10 @@ export async function create_profile(req, res) {
     } catch (err) {
         sendResponse(res, 500, 'Server error', err.message);
     }
-}
+};
 
 // Get Profile
-export async function get_profile(req, res) {
+const get_profile = async (req, res) => {
     try {
         const { email } = req.params;
 
@@ -46,10 +39,10 @@ export async function get_profile(req, res) {
     } catch (err) {
         sendResponse(res, 500, 'Server error', err.message);
     }
-}
+};
 
 // Update Profile
-export async function update_profile(req, res) {
+const update_profile = async (req, res) => {
     try {
         const { email } = req.params;
         const updates = req.body;
@@ -61,20 +54,20 @@ export async function update_profile(req, res) {
     } catch (err) {
         sendResponse(res, 500, 'Server error', err.message);
     }
-}
+};
 
 // Change Password
-export async function change_password(req, res) {
+const change_password = async (req, res) => {
     try {
         const { email, current_password, new_password } = req.body;
 
         const user = await User.findOne({ email });
         if (!user) return sendResponse(res, 404, 'User not found');
 
-        const isMatch = await comparePassword(current_password, user.password);
+        const isMatch = await compare_password(current_password, user.password);
         if (!isMatch) return sendResponse(res, 400, 'Current password is incorrect');
 
-        const hashedPassword = await hashPassword(new_password);
+        const hashedPassword = await hash_password(new_password);
         user.password = hashedPassword;
         await user.save();
 
@@ -82,10 +75,10 @@ export async function change_password(req, res) {
     } catch (err) {
         sendResponse(res, 500, 'Server error', err.message);
     }
-}
+};
 
 // Create or Update Profile (Upsert)
-export async function upsert_profile(req, res) {
+const upsert_profile = async (req, res) => {
     try {
         const { id } = req.user; // Assuming the user ID is available from the token
         const { skills, experience, qualification, bio } = req.body;
@@ -100,10 +93,10 @@ export async function upsert_profile(req, res) {
     } catch (err) {
         sendResponse(res, 500, 'Server error', err.message);
     }
-}
+};
 
 // Get Profile by ID
-export async function get_profile_by_id(req, res) {
+const get_profile_by_id = async (req, res) => {
     try {
         const { user_id } = req.params;
 
@@ -114,10 +107,10 @@ export async function get_profile_by_id(req, res) {
     } catch (err) {
         sendResponse(res, 500, 'Server error', err.message);
     }
-}
+};
 
 // Upload Profile Picture
-export async function upload_profile_photo_controller(req, res) {
+const upload_profile_photo_controller = async (req, res) => {
     try {
         const user_id = req.user.id; // Assuming authentication middleware is applied
         const file = req.file;
@@ -142,10 +135,10 @@ export async function upload_profile_photo_controller(req, res) {
     } catch (err) {
         sendResponse(res, 500, 'Server error', err.message);
     }
-}
+};
 
 // Upload Resume
-export async function upload_resume_controller(req, res) {
+const upload_resume_controller = async (req, res) => {
     try {
         const user_id = req.user.id;
         const file = req.file;
@@ -164,10 +157,10 @@ export async function upload_resume_controller(req, res) {
     } catch (err) {
         sendResponse(res, 500, 'Server error', err.message);
     }
-}
+};
 
 // Get Profile Photo
-export async function get_profile_photo(req, res) {
+const get_profile_photo = async (req, res) => {
     try {
         const { user_id } = req.params;
 
@@ -180,10 +173,10 @@ export async function get_profile_photo(req, res) {
     } catch (err) {
         sendResponse(res, 500, 'Server error', err.message);
     }
-}
+};
 
 // Get Resume
-export async function get_resume(req, res) {
+const get_resume = async (req, res) => {
     try {
         const { user_id } = req.params;
 
@@ -196,12 +189,18 @@ export async function get_resume(req, res) {
     } catch (err) {
         sendResponse(res, 500, 'Server error', err.message);
     }
-}
+};
 
-// Validation Middleware (using express-validator)
-export const validateCreateUser = [
-    check('first_name').notEmpty().withMessage('First name is required'),
-    check('last_name').notEmpty().withMessage('Last name is required'),
-    check('email').isEmail().withMessage('Invalid email format'),
-    check('password').isLength({ min: 6 }).withMessage('Password should be at least 6 characters')
-];
+// Export the controller functions as an object
+module.exports = {
+    create_profile,
+    get_profile,
+    update_profile,
+    change_password,
+    upsert_profile,
+    get_profile_by_id,
+    upload_profile_photo_controller,
+    upload_resume_controller,
+    get_profile_photo,
+    get_resume
+};

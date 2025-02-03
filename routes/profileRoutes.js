@@ -1,48 +1,37 @@
-import { Router } from 'express';
-import {
-    create_profile,
-    get_profile,
-    update_profile,
-    change_password,
-    upsert_profile,
-    get_profile_by_id,
-    upload_profile_photo_controller,
-    upload_resume_controller,
-    get_profile_photo,
-    get_resume
-} from '../controllers/profileController.js';
-import { authenticate } from '../middlewares/auth.js';
+const express = require('express');
+const router = express.Router();
+const { create_profile, get_profile, update_profile, change_password, upsert_profile, get_profile_by_id, upload_profile_photo_controller, upload_resume_controller, get_profile_photo, get_resume } = require('../controllers/profileController');
+const { validateCreateProfile, validateChangePassword } = require('../validators/profile_validator');
+const { validateRequest } = require('../middlewares/responseMiddleware'); // Assuming you created a middleware to handle validation errors
 
-const router = Router();
+// Create Profile Route
+router.post('/profile', validateCreateProfile, validateRequest, create_profile);
 
-// Create Profile
-router.post('/profile', authenticate, create_profile);
+// Get Profile Route
+router.get('/profile/:email', get_profile);
 
-// Get Profile by Email
-router.get('/profile/:email', authenticate, get_profile);
+// Update Profile Route
+router.put('/profile/:email', validateCreateProfile, validateRequest, update_profile);
 
-// Update Profile by Email
-router.put('/profile/:email', authenticate, update_profile);
+// Change Password Route
+router.put('/profile/change-password', validateChangePassword, validateRequest, change_password);
 
-// Change Password
-router.post('/change-password', authenticate, change_password);
+// Upsert Profile Route
+router.put('/profile/upsert', upsert_profile);
 
-// Create or Update Profile (Upsert)
-router.put('/upsert-profile', authenticate, upsert_profile);
+// Get Profile by ID Route
+router.get('/profile/id/:user_id', get_profile_by_id);
 
-// Get Profile by ID (User-specific)
-router.get('/profile/id/:user_id', authenticate, get_profile_by_id);
+// Upload Profile Picture Route
+router.post('/profile/upload-photo', upload_profile_photo_controller);
 
-// Upload Profile Picture
-router.post('/upload-profile-photo', authenticate, upload_profile_photo_controller);
+// Upload Resume Route
+router.post('/profile/upload-resume', upload_resume_controller);
 
-// Upload Resume
-router.post('/upload-resume', authenticate, upload_resume_controller);
+// Get Profile Photo Route
+router.get('/profile/photo/:user_id', get_profile_photo);
 
-// Get Profile Photo
-router.get('/profile-photo/:user_id', authenticate, get_profile_photo);
+// Get Resume Route
+router.get('/profile/resume/:user_id', get_resume);
 
-// Get Resume
-router.get('/resume/:user_id', authenticate, get_resume);
-
-export default router;
+module.exports = router;
