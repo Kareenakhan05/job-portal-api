@@ -1,17 +1,12 @@
-const { validationResult } = require('express-validator');
-
-// Middleware for handling validation errors
-const validateRequest = (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({
-            message: 'Validation failed',
-            errors: errors.array()
-        });
-    }
-    next();
+// Centralized Response Handler
+const send_response = (res, status, message, data = null) => {
+    return res.status(status).json({
+        success: status >= 200 && status < 300, // true for 2xx status codes
+        message,
+        data,
+    });
 };
 
 module.exports = {
-    validateRequest
+    send_response
 };

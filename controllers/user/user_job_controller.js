@@ -1,10 +1,7 @@
-const Job = require('../models/job');  // Using require for module import
+const Job = require('../../models/job');
 const { validationResult } = require('express-validator');
-
-// Helper function for standardized responses
-const sendResponse = (res, status, message, data = null) => {
-    return res.status(status).json({ message, data });
-};
+const { send_response } = require('../../middlewares/responseMiddleware'); // Centralized response handler
+const { compare_password, generate_token } = require('../../helpers/auth_helpers'); // Helper functions
 
 // Search Jobs
 async function search_jobs(req, res) {
@@ -19,9 +16,9 @@ async function search_jobs(req, res) {
             ],
         });
 
-        sendResponse(res, 200, 'Jobs retrieved successfully', jobs);
-    } catch (err) {
-        sendResponse(res, 500, 'Server error', err.message);
+        return send_response(res, 200, 'Jobs retrieved successfully', jobs);
+    } catch (error) {
+        return send_response(res, 500, 'Server error', error.message);
     }
 }
 
@@ -32,18 +29,18 @@ async function apply_for_job(req, res) {
         const { job_id } = req.params;
 
         const job = await Job.findById(job_id);
-        if (!job) return sendResponse(res, 404, 'Job not found');
+        if (!job) return send_response(res, 404, 'Job not found');
 
         if (job.applicants.includes(user_id)) {
-            return sendResponse(res, 400, 'You have already applied for this job');
+            return send_response(res, 400, 'You have already applied for this job');
         }
 
         job.applicants.push(user_id);
         await job.save();
 
-        sendResponse(res, 200, 'Application submitted successfully');
-    } catch (err) {
-        sendResponse(res, 500, 'Server error', err.message);
+        return send_response(res, 200, 'Application submitted successfully');
+    } catch (error) {
+        return send_response(res, 500, 'Server error', error.message);
     }
 }
 
@@ -53,13 +50,12 @@ async function get_job_details(req, res) {
         const { job_id } = req.params;
 
         const job = await Job.findById(job_id).populate('posted_by', 'name email');
-        if (!job) return sendResponse(res, 404, 'Job not found');
+        if (!job) return send_response(res, 404, 'Job not found');
 
-        sendResponse(res, 200, 'Job details retrieved successfully', job);
-    } catch (err) {
-        sendResponse(res, 500, 'Server error', err.message);
+        return send_response(res, 200, 'Job details retrieved successfully', job);
+    } catch (error) {
+        return send_response(res, 500, 'Server error', error.message);
     }
 }
 
-// Export functions using module.exports
 module.exports = { search_jobs, apply_for_job, get_job_details };
