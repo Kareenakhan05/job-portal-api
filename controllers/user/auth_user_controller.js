@@ -124,10 +124,29 @@ const reset_password = async (req, res) => {
     }
 };
 
+const logout_user = async (req, res, next) => {
+    try {
+        // Invalidate token on the client-side (handled by frontend)
+        req.user = null; // Clear user data from the request
+
+        return res.status(200).json({
+            success: true,
+            message: 'Logout successful.',
+        });
+    } catch (error) {
+        next({
+            status: 500,
+            message: 'Server error during logout',
+            data: error.message,
+        });
+    }
+};
+
 module.exports = {
     register,
     verify_registration_otp,
     login,
+    logout_user,
     forgot_password,
     reset_password
 };

@@ -1,23 +1,44 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
+const user = require('../models/user'); // Assuming recruiter data is stored in the User model
 
-const authenticateRecruiter = async (req, res, next) => {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    if (!token) return res.status(401).json({ message: 'No token provided' });
+const authenticate_recruiter = async (req, res, next) => {
+    const { token } = req.body;  // Extract token from the body
+
+    // Check if the token is provided
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            message: 'No token provided'
+        });
+    }
 
     try {
+        // Decode and verify the JWT token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id);
 
-        if (!user || user.role !== 'recruiter') {
-            return res.status(403).json({ message: 'Access denied' });
+        // Fetch the recruiter from the database using the decoded ID
+        const recruiter_data = await user.findById(decoded.id);
+
+        // Check if the recruiter is valid and has the correct role
+        if (!recruiter_data || recruiter_data.role !== 'recruiter') {
+            return res.status(403).json({
+                success: false,
+                message: 'Access denied: Unauthorized recruiter'
+            });
         }
 
-        req.user = user; // Attach recruiter data to the request
+        // Attach recruiter data to the request object for use in the next middleware or route handler
+        req.user = recruiter_data;
+
+        // Continue to the next middleware or route handler
         next();
     } catch (err) {
-        return res.status(401).json({ message: 'Invalid token' });
+        // Handle invalid token error
+        return res.status(401).json({
+            success: false,
+            message: 'Invalid token'
+        });
     }
 };
 
-module.exports = authenticateRecruiter;
+module.exports = authenticate_recruiter;
