@@ -1,12 +1,9 @@
-// Centralized Response Handler
-const send_response = (res, status, message, data = null) => {
-    return res.status(status).json({
-        success: status >= 200 && status < 300, // true for 2xx status codes
-        message,
-        data,
-    });
-};
+function responseMiddleware(req, res, next) {
+    res.send_response = function (status, message, data = null) {
+        return res.status(status).json({ status, message, data });
+    };
+    next(); // Proceed to the next middleware
+}
 
-module.exports = {
-    send_response
-};
+
+module.exports = responseMiddleware;

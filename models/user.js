@@ -1,71 +1,94 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-const user_schema = new mongoose.Schema({
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true
+const user_schema = new mongoose.Schema(
+    {
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            trim: true,
+            lowercase: true,
+            match: [/^\S+@\S+\.\S+$/, 'Invalid email format'],
+        },
+        password: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        name: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        phone: {
+            type: String,
+            required: true,
+            trim: true,
+            match: [/^\d{10}$/, 'Phone number must be 10 digits'],
+        },
+        address: {
+            type: String,
+            default: null,
+            trim: true,
+        },
+        bio: {
+            type: String,
+            default: null,
+            trim: true,
+        },
+        skills: {
+            type: [String],
+            default: [],
+        },
+        experience: {
+            type: String,
+            default: null,
+            trim: true,
+        },
+        qualification: {
+            type: String,
+            default: null,
+            trim: true,
+        },
+        resume: {
+            type: String,
+            default: null,
+        },
+        profile_picture: {
+            type: String,
+            default: null,
+        },
+        role: {
+            type: String,
+            enum: ['job_seeker', 'recruiter', 'admin'],
+            required: true,
+        },
+        status: {
+            type: String,
+            enum: ['pending', 'approved', 'rejected'],
+            default: 'pending',
+        },
     },
-    password: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    phone: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    address: {
-        type: String,
-        default: null,
-        trim: true
-    },
-    bio: {
-        type: String,
-        default: null,
-        trim: true
-    },
-    skills: {
-        type: [String],
-        default: []
-    },
-    experience: {
-        type: String,
-        default: null,
-        trim: true
-    },
-    qualification: {
-        type: String,
-        default: null,
-        trim: true
-    },
-    resume: { // Stores resume file path or URL
-        type: String,
-        default: null
-    },
-    profile_picture: { // Stores profile picture path or URL
-        type: String,
-        default: null
-    },
-    role: { // Differentiates Job Seeker and Recruiter
-        type: String,
-        enum: ['job_seeker', 'recruiter', 'admin'],
-        required: true
-    },
-    status: { // Approval status for recruiters
-        type: String,
-        enum: ['pending', 'approved', 'rejected'],
-        default: 'pending'
-    }
-}, { timestamps: true });
+    { timestamps: true }
+);
+
+// ✅ Indexing for faster searches
+user_schema.index({ email: 1 });
+
+// ✅ Hash password before saving
+user_schema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+});
+
+// ✅ Method to compare passwords
+user_schema.methods.comparePassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
+};
 
 const User = mongoose.model('User', user_schema);
 
-export default User;
+module.exports = User;

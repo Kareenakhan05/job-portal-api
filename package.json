@@ -2,7 +2,7 @@
   "name": "candidate-api",
   "version": "1.0.0",
   "main": "app.js",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",

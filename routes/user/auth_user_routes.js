@@ -9,7 +9,7 @@ const {
     reset_password
 } = require('../../controllers/user/auth_user_controller');
 
-const authenticate_user = require('../middlewares/authenticate_user');
+const authenticate_user = require('../../middlewares/authenticate_user');
 const {
     registerValidator,
     loginValidator,

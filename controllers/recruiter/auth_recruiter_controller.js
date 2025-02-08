@@ -2,7 +2,7 @@ const Recruiter = require("../../models/recruiter");
 const { validationResult } = require("express-validator");
 const otpCache = require("../../services/otpCache");
 const { generate_OTP, send_OTP, verify_OTP } = require("../../utils/otp");
-const { generate_token, hash_password, compare_password } = require("../../helpers/auth_helper");
+const { generate_token, hash_password, compare_password } = require("../../helpers/auth_helpers");
 
 // Register Recruiter with OTP
 const register_recruiter = async (req, res, next) => {

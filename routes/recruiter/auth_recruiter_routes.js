@@ -1,14 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const {
-    registerRecruiter,
-    verifyOtp,
-    loginRecruiter,
+    register_recruiter,
+    verify_otp,
+    login_recruiter,
     logout_recruiter,
-    forgotPassword,
-    resetPassword
-} = require("../controllers/auth_recruiter");
-const authenticate_recruiter = require('../middlewares/authenticate_recruiter');
+    forgot_password,
+    reset_password
+} = require("../../controllers/recruiter/auth_recruiter_controller");
+
+const authenticate_recruiter = require('../../middlewares/authenticate_recruiter');
+
+
 const {
     registerRecruiterValidator,
     loginValidator,
@@ -16,11 +19,11 @@ const {
     resetPasswordValidator
 } = require("../../validators/recruiter/auth_recruiter_validator");
 
-router.post('/register', registerRecruiterValidator, registerRecruiter);
-router.post('/verify-otp', verifyOtp);
-router.post('/login', loginValidator, loginRecruiter);
+router.post('/register', registerRecruiterValidator, register_recruiter);
+router.post('/verify-otp', verify_otp);
+router.post('/login', loginValidator, login_recruiter);
 router.post('/logout', authenticate_recruiter, logout_recruiter);
-router.post('/forgot-password', forgotPasswordValidator, forgotPassword);
-router.post('/reset-password', resetPasswordValidator, resetPassword);
+router.post('/forgot-password', forgotPasswordValidator, forgot_password);
+router.post('/reset-password', resetPasswordValidator, reset_password);
 
 module.exports = router;

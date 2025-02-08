@@ -1,64 +1,67 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const connectDB = require('./database/db');  // Database connection
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const { errorHandler } = require('./middlewares/errorHandler');
-const responseMiddleware = require('./middlewares/responseMiddleware'); // Response middleware
 
-// Importing routes
-const authRecruiterRoutes = require('./routes/recruiter/auth_recruiter_routes');
-const authUserRoutes = require('./routes/user/auth_user_routes');
-const recruiterProfileRoutes = require('./routes/recruiter/recruiter_profile_routes');
-const userProfileRoutes = require('./routes/user/user_profile_routes');
-const userJobRoutes = require('./routes/user/user_job_routes');
-const recruiterJobRoutes = require('./routes/recruiter/recruiter_job_routes');
+const connectDB = require('./database/db');  
+const errorHandler = require('./middlewares/errorHandler');
+const responseMiddleware = require('./middlewares/responseMiddleware');
 
+// Load environment variables
 dotenv.config();
 
-// Ensure required environment variables are set
+// Validate required environment variables
 if (!process.env.MONGO_URI) {
-    console.error('ERROR: Missing MONGO_URI in environment variables');
-    process.exit(1); // Exit if necessary environment variables are missing
+    console.error('❌ ERROR: Missing MONGO_URI in environment variables');
+    process.exit(1);
 }
 
+// Initialize Express app
 const app = express();
 
-// Middleware
-app.use(cors());                      // Enable Cross-Origin Resource Sharing
-app.use(helmet());                    // Secure HTTP headers
-app.use(express.json());              // Body parsing middleware
-app.use(morgan('dev'));               // HTTP request logger for development
-app.use(responseMiddleware);          // Response middleware for consistent responses
+// Global Middlewares
+app.use(cors());
+app.use(helmet());
+app.use(express.json());
+app.use(morgan('dev'));
 
-// Connect to the database
+// Attach response middleware correctly
+app.use(responseMiddleware);
+
+// Connect to Database
 connectDB();
 
 // Routes
-app.use('/api/auth/recruiter', authRecruiterRoutes);       // Recruiter Authentication APIs
-app.use('/api/auth/user', authUserRoutes);                 // User Authentication APIs
-app.use('/api/recruiter/profile', recruiterProfileRoutes); // Recruiter Profile APIs
-app.use('/api/user/profile', userProfileRoutes);           // User Profile APIs
-app.use('/api/user/jobs', userJobRoutes);                  // User Job APIs
-app.use('/api/recruiter/jobs', recruiterJobRoutes);        // Recruiter Job APIs
+const routes = {
+    recruiterAuth: require('./routes/recruiter/auth_recruiter_routes'),
+    userAuth: require('./routes/user/auth_user_routes'),
+    recruiterProfile: require('./routes/recruiter/recruiter_profile_routes'),
+    userProfile: require('./routes/user/user_profile_routes'),
+    userJobs: require('./routes/user/user_job_routes'),
+    recruiterJobs: require('./routes/recruiter/recruiter_job_routes')
+};
+
+// Assign Routes
+app.use('/api/auth/recruiter', routes.recruiterAuth);
+app.use('/api/auth/user', routes.userAuth);
+app.use('/api/recruiter/profile', routes.recruiterProfile);
+app.use('/api/user/profile', routes.userProfile);
+app.use('/api/user/jobs', routes.userJobs);
+app.use('/api/recruiter/jobs', routes.recruiterJobs);
 
 // Handle Undefined Routes
-app.use((req, res) => {
-    res.status(404).json({ message: 'Route not found' });
-});
+app.use((req, res) => res.status(404).json({ status: 404, message: 'Route not found' }));
 
-// Centralized Error Handling Middleware
+// Error Handling Middleware
 app.use(errorHandler);
 
-// Server initialization
+// Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 
-// Graceful shutdown handling
+// Graceful Shutdown
 process.on('SIGINT', () => {
-    console.log('Gracefully shutting down...');
-    process.exit(0); // Exit gracefully on termination
+    console.log('🔻 Gracefully shutting down...');
+    process.exit(0);
 });

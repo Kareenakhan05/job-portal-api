@@ -1,13 +1,12 @@
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs'; // Use bcryptjs for compatibility with ES modules
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 // Generate a JWT token
-export function generate_token(user) {
+function generate_token(user) {
     if (!process.env.JWT_SECRET) {
         throw new Error("Missing JWT_SECRET in environment variables");
     }
 
-    // Ensure that the user object contains the required _id property
     if (!user._id) {
         throw new Error("User object must contain _id");
     }
@@ -16,7 +15,7 @@ export function generate_token(user) {
 }
 
 // Hash a password
-export async function hash_password(password) {
+async function hash_password(password) {
     if (!password) {
         throw new Error("Password cannot be empty");
     }
@@ -30,7 +29,7 @@ export async function hash_password(password) {
 }
 
 // Compare a password with its hashed version
-export async function compare_password(password, hashedPassword) {
+async function compare_password(password, hashedPassword) {
     if (!password || !hashedPassword) {
         throw new Error("Password and hashed password cannot be empty");
     }
@@ -41,3 +40,9 @@ export async function compare_password(password, hashedPassword) {
         throw new Error("Error while comparing password: " + error.message);
     }
 }
+
+module.exports = {
+    generate_token,
+    hash_password,
+    compare_password
+};

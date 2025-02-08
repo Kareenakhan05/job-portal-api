@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
@@ -6,11 +6,14 @@ const connectDB = async () => {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
-        console.log('Database connected successfully');
+
+        console.log('✅ MongoDB connected successfully');
     } catch (error) {
-        console.error('Error connecting to the database', error);
-        process.exit(1); // Exit the process with failure
+        console.error('❌ MongoDB connection error:', error.message);
+        
+        // Retry after 5 seconds if the connection fails
+        setTimeout(connectDB, 5000);
     }
 };
 
-export default connectDB;
+module.exports = connectDB;
