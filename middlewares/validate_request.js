@@ -1,5 +1,5 @@
 const { validationResult } = require('express-validator');
-const { send_response } = require('./responseMiddleware'); 
+const { send_response } = require('../middlewares/responseMiddleware'); // ✅ Fix relative path
 
 const validate_request = (req, res, next) => {
     console.log("🛠 Running validate_request middleware...");
@@ -13,6 +13,4 @@ const validate_request = (req, res, next) => {
     next();
 };
 
-module.exports = {
-    validate_request
-};
+module.exports = validate_request; // ✅ Ensure it's exported correctly

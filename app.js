@@ -39,7 +39,11 @@ const routes = {
     recruiterProfile: require('./routes/recruiter/recruiter_profile_routes'),
     userProfile: require('./routes/user/user_profile_routes'),
     userJobs: require('./routes/user/user_job_routes'),
-    recruiterJobs: require('./routes/recruiter/recruiter_job_routes')
+    recruiterJobs: require('./routes/recruiter/recruiter_job_routes'),
+    admin_auth_routes: require('./routes/admin/admin_auth_routes'),
+ admin_dashboard_routes: require('./routes/admin/admin_dashboard_routes'),
+ manage_recruiters_routes: require('./routes/admin/manage_recruiters_routes'),
+ team_routes: require('./routes/admin/team_routes')
 };
 
 // Assign Routes
@@ -49,6 +53,10 @@ app.use('/api/recruiter/profile', routes.recruiterProfile);
 app.use('/api/user/profile', routes.userProfile);
 app.use('/api/user/jobs', routes.userJobs);
 app.use('/api/recruiter/jobs', routes.recruiterJobs);
+app.use('/api/admin/auth', routes.admin_auth_routes); // Admin Authentication APIs
+app.use('/api/admin/dashboard', routes.admin_dashboard_routes); // Admin Dashboard APIs
+app.use('/api/admin/recruiters', routes.manage_recruiters_routes); // Recruiter Management APIs
+app.use('/api/admin/team', routes.team_routes); // Team Management APIs
 
 // Handle Undefined Routes
 app.use((req, res) => res.status(404).json({ status: 404, message: 'Route not found' }));
@@ -65,3 +73,5 @@ process.on('SIGINT', () => {
     console.log('🔻 Gracefully shutting down...');
     process.exit(0);
 });
+
+
