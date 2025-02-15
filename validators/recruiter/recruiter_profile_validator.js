@@ -1,6 +1,14 @@
-const { body } = require('express-validator');
+const { body, validationResult } = require('express-validator');
 
-//  Profile Validator
+// Helper function to handle validation errors
+const handleValidationErrors = (req) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        throw new Error(errors.array()[0].msg); // Throw the first validation error
+    }
+};
+
+// ✅ Profile Validator
 const validate_profile = [
     body('company_name')
         .optional()
@@ -17,17 +25,35 @@ const validate_profile = [
     body('profile_picture')
         .optional()
         .isURL()
-        .withMessage('Profile picture must be a valid URL')
+        .withMessage('Profile picture must be a valid URL'),
+
+    (req, res, next) => {
+        try {
+            handleValidationErrors(req);
+            next();
+        } catch (err) {
+            return res.status(400).json({ status: 400, message: err.message });
+        }
+    }
 ];
 
-//  Password Change Validator
+// ✅ Password Change Validator
 const validate_password_change = [
     body('old_password')
         .notEmpty()
         .withMessage('Old password is required'),
     body('new_password')
         .isLength({ min: 6 })
-        .withMessage('New password must be at least 6 characters long')
+        .withMessage('New password must be at least 6 characters long'),
+
+    (req, res, next) => {
+        try {
+            handleValidationErrors(req);
+            next();
+        } catch (err) {
+            return res.status(400).json({ status: 400, message: err.message });
+        }
+    }
 ];
 
 module.exports = {

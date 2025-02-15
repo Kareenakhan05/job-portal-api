@@ -77,6 +77,25 @@ const reject_recruiter = async (req, res) => {
     }
 };
 
+// ✅ PUT: Edit Recruiter Details 
+const edit_recruiter = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updateData = req.body; // Fields to update
+
+        const recruiter = await Recruiter.findByIdAndUpdate(id, updateData, { new: true });
+
+        if (!recruiter) {
+            return responseHelper.not_found(res, 'Recruiter not found');
+        }
+
+        return responseHelper.success(res, recruiter, 'Recruiter details updated successfully');
+    } catch (error) {
+        return responseHelper.error(res, error.message);
+    }
+};
+
+
 // ✅ DELETE: Delete Recruiter
 const delete_recruiter = async (req, res) => {
     try {
@@ -110,11 +129,14 @@ const get_recruiter_details = async (req, res) => {
     }
 };
 
+
+
 // ✅ Export all functions using `module.exports = {}` approach
 module.exports = {
     get_recruiters,
     approve_recruiter,
     reject_recruiter,
+    edit_recruiter,
     delete_recruiter,
     get_recruiter_details
 };

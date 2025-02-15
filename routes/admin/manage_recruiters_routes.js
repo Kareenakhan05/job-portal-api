@@ -31,4 +31,10 @@ router.delete('/:id',
     recruiterController.delete_recruiter
 );
 
+router.put('/:id/edit', 
+    authMiddleware, 
+    validate_id, 
+    recruiterController.edit_recruiter 
+);
+
 module.exports = router;
