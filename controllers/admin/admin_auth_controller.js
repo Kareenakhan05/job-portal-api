@@ -1,11 +1,11 @@
 const Admin = require('../../models/admin.js');
-const User = require('../../models/user.js');  // Assuming you have a User model for recruiters and users
+const Recruiter = require('../../models/recruiter.js'); 
 const { generate_token, hash_password, compare_password } = require('../../helpers/auth_helpers.js');
 const { send_response } = require('../../helpers/response_helpers.js');
 const { sendOtp, verifyOtp } = require('../../services/otp_services.js');
 const { validationResult } = require('express-validator');
 
-// Register Admin with OTP verification
+// 🚀 Register Admin with OTP Verification
 const register_admin = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -35,8 +35,8 @@ const register_admin = async (req, res) => {
     }
 };
 
-// Admin Login
-const login_admin = async (req, res) => {
+// 🚀 Universal Login (Admin & Recruiter)
+const login_user = async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -45,23 +45,43 @@ const login_admin = async (req, res) => {
 
         const { email, password } = req.body;
 
-        const admin = await Admin.findOne({ email });
-        if (!admin) {
-            return send_response(res, 404, 'Admin not found');
+        // Check if user exists in Admin collection
+        let user = await Admin.findOne({ email });
+        let user_type = 'admin';
+
+        if (!user) {
+            // If not found in Admin, check in Recruiter collection
+            user = await Recruiter.findOne({ email });
+            user_type = 'recruiter';
         }
 
-        if (!(await compare_password(password, admin.password))) {
+        if (!user) {
+            return send_response(res, 404, 'User not found');
+        }
+
+        // Verify password
+        if (!(await compare_password(password, user.password))) {
             return send_response(res, 401, 'Invalid credentials');
         }
 
-        const token = generate_token(admin._id);
-        send_response(res, 200, 'Login successful', { token });
+        // Generate JWT token
+        const token = generate_token(user._id);
+
+        // Send response with user type
+        send_response(res, 200, 'Login successful', {
+            token,
+            user_id: user._id,
+            name: user.name,
+            email: user.email,
+            user_type
+        });
+
     } catch (err) {
         send_response(res, 500, 'Server error', err.message);
     }
 };
 
-// Forgot Password
+// 🚀 Forgot Password - Send OTP
 const forgot_password = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -71,8 +91,10 @@ const forgot_password = async (req, res) => {
 
         const { email } = req.body;
 
-        if (!(await Admin.findOne({ email }))) {
-            return send_response(res, 404, 'Admin not found');
+        let user = await Admin.findOne({ email }) || await Recruiter.findOne({ email });
+
+        if (!user) {
+            return send_response(res, 404, 'User not found');
         }
 
         sendOtp(email);
@@ -83,7 +105,7 @@ const forgot_password = async (req, res) => {
     }
 };
 
-// Reset Password (Change Password)
+// 🚀 Reset Password with OTP
 const reset_password = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -98,13 +120,14 @@ const reset_password = async (req, res) => {
         }
 
         const hashed_password = await hash_password(new_password);
-        const admin = await Admin.findOne({ email });
-        if (!admin) {
-            return send_response(res, 404, 'Admin not found');
+        let user = await Admin.findOne({ email }) || await Recruiter.findOne({ email });
+
+        if (!user) {
+            return send_response(res, 404, 'User not found');
         }
 
-        admin.password = hashed_password;
-        await admin.save();
+        user.password = hashed_password;
+        await user.save();
 
         send_response(res, 200, 'Password reset successfully');
     } catch (err) {
@@ -112,8 +135,8 @@ const reset_password = async (req, res) => {
     }
 };
 
-// Admin Logout (Client-Side Token Removal)
-const logout_admin = async (req, res) => {
+// 🚀 Admin Logout (Client-Side Token Removal)
+const logout_user = async (req, res) => {
     try {
         // Since JWTs are stateless, we just instruct the client to remove the token
         send_response(res, 200, 'Logout successful');
@@ -122,14 +145,11 @@ const logout_admin = async (req, res) => {
     }
 };
 
-
-
-// Export the controller functions
+// ✅ Export the controller functions
 module.exports = {
     register_admin,
-    login_admin,
+    login_user,
     forgot_password,
     reset_password,
-    logout_admin
-    
+    logout_user
 };

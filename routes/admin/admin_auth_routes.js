@@ -4,10 +4,10 @@ const router = express.Router();
 // Import Controllers
 const { 
     register_admin, 
-    login_admin, 
+    login_user, 
     forgot_password, 
     reset_password,
-    logout_admin
+    logout_user
 } = require("../../controllers/admin/admin_auth_controller.js");
 
 // Import Middlewares
@@ -24,9 +24,9 @@ const {
 
 // ✅ Correct Middleware Usage
 router.post('/register', register_admin_validator, validate_request, register_admin);
-router.post('/login', login_admin_validator, validate_request, login_admin);
+router.post('/login', login_admin_validator, validate_request, login_user);
 router.post('/forgot-password', forgot_password_validator, validate_request, forgot_password);
 router.post('/reset-password', reset_password_validator, validate_request, reset_password);
-router.post('/logout', logout_admin_validator, validate_request, logout_admin);
+router.post('/logout', logout_admin_validator, validate_request, logout_user);
 
 module.exports = router;

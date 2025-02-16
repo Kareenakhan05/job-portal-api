@@ -1,12 +1,15 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const SubscriptionSchema = new mongoose.Schema(
     {
-        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        plan: String,
-        amount: Number
+        plan_name: { type: String, required: true },
+        job_post_limit: { type: Number, required: true },
+        resume_check_limit: { type: Number, required: true },
+        validity_days: { type: Number, required: true },
+        price: { type: Number, required: true },
+        is_deleted: { type: Boolean, default: false }
     },
     { timestamps: true }
 );
 
-module.exports = mongoose.model("Subscription", SubscriptionSchema);
+module.exports = mongoose.model('Subscription', SubscriptionSchema);
