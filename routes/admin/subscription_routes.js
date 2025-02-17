@@ -4,7 +4,7 @@ const { create_subscription, get_all_subscriptions, get_subscription_by_id, upda
 const { validate_subscription } = require('../../validators/admin/subscription_validators');
 const auth_middleware = require('../../middlewares/auth_middleware');
 
-// ✅ Subscription Management Routes
+// ✅ Subscriptions Management Routes
 router.post('/create', auth_middleware, validate_subscription, create_subscription);
 router.get('/', auth_middleware, get_all_subscriptions);
 router.get('/:id', auth_middleware, get_subscription_by_id);

@@ -11,7 +11,7 @@ const {
     change_status 
 } = require('../../controllers/admin/team_controller');
 
-// ✅ Import Middlewares & Validators
+// ✅ Import Middlewares & Validator
 const { validate_team, validate_status, validate_id } = require('../../validators/admin/team_validator');
 const auth_middleware = require('../../middlewares/auth_middleware');
 
