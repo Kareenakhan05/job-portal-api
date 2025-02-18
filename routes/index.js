@@ -12,6 +12,8 @@ const adminAuthRoutes = require('./admin/admin_auth_routes');
 const adminDashboardRoutes = require('./admin/admin_dashboard_routes');
 const manageRecruitersRoutes = require('./admin/manage_recruiters_routes');
 const teamRoutes = require('./admin/team_routes');
+const subscriptionRoutes = require('./admin/subscription_routes');
+const cmsRoutes = require('./admin/cms_routes');  // ✅ Added CMS Routes
 
 // Assign routes with base paths
 router.use('/api/auth/recruiter', recruiterAuthRoutes);
@@ -24,6 +26,8 @@ router.use('/api/admin/auth', adminAuthRoutes);
 router.use('/api/admin/dashboard', adminDashboardRoutes);
 router.use('/api/admin/recruiters', manageRecruitersRoutes);
 router.use('/api/admin/team', teamRoutes);
+router.use('/api/admin/subscriptions', subscriptionRoutes);  
+router.use('/api/admin/cms', cmsRoutes);  // ✅ Integrated CMS Routes
 
 // Handle Undefined Routes
 router.use((req, res) => res.status(404).json({ status: 404, message: 'Route not found' }));
