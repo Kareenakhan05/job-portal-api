@@ -69,12 +69,38 @@ const user_schema = new mongoose.Schema(
             enum: ['pending', 'approved', 'rejected'],
             default: 'pending',
         },
+        // ✅ Recruiter ke liye department field add kiya
+        department: {
+            type: String,
+            enum: ['Frontend Developer', 'Backend Developer', 'DevOps', 'API Handler', 'Data Scientist'],
+            default: null
+        },
+        // ✅ Recruiter ke liye company_name add kiya
+        company_name: {
+            type: String,
+            default: null,
+            trim: true
+        },
+        // ✅ Soft delete feature
+        is_deleted: {
+            type: Boolean,
+            default: false
+        },
+        // ✅ Forgot password token system
+        reset_password_token: {
+            type: String,
+            default: null
+        },
+        reset_password_expires: {
+            type: Date,
+            default: null
+        }
     },
     { timestamps: true }
 );
 
 // ✅ Indexing for faster searches
-user_schema.index({ email: 1 });
+user_schema.index({ email: 1, role: 1, status: 1 });
 
 // ✅ Hash password before saving
 user_schema.pre('save', async function (next) {

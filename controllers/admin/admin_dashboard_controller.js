@@ -12,23 +12,18 @@ const get_admin_overview = async (req, res) => {
         const total_subscriptions = await Subscription.countDocuments();
         const registered_candidates = await User.countDocuments({ role: 'candidate' });
         const total_companies = await Company.countDocuments();
-        
-        // ✅ Fetch Visitors by Platform
+
+        // ✅ Fetch Visitors by Platform (Dynamic)
         const visitor_data = await Visitor.aggregate([
-            { 
-                $group: { 
-                    _id: "$platform", 
-                    total_visitors: { $sum: "$count" } 
-                } 
+            {
+                $group: {
+                    _id: "$platform",
+                    total_visitors: { $sum: "$count" }
+                }
             }
         ]);
 
-        // ✅ Transform visitor data into key-value pairs
-        let total_visitors = {
-            "First Platform": 0,
-            "Second Platform": 0,
-            "Aggregate Store": 0
-        };
+        let total_visitors = {};
         visitor_data.forEach(item => {
             total_visitors[item._id] = item.total_visitors;
         });
@@ -48,16 +43,19 @@ const get_admin_overview = async (req, res) => {
     }
 };
 
-// ✅ 2️⃣ GET /admin/department-distribution → Fetch Recruiter Department Distribution
+// ✅ 2️⃣ GET /admin/department-distribution → Dynamic Recruiter Department Distribution
 const get_department_distribution = async (req, res) => {
     try {
+        // ✅ Fetch department-wise recruiter count
         const department_distribution = await User.aggregate([
             { $match: { role: 'recruiter' } },
             { $group: { _id: "$department", count: { $sum: 1 } } }
         ]);
 
-        // ✅ Convert to percentage
-        const total_recruiters = department_distribution.reduce((acc, item) => acc + item.count, 0);
+        // ✅ Total recruiters count
+        const total_recruiters = department_distribution.reduce((acc, item) => acc + item.count, 0) || 1;
+
+        // ✅ Convert into dynamic percentage format
         const department_data = department_distribution.map(item => ({
             department: item._id,
             percentage: ((item.count / total_recruiters) * 100).toFixed(2) + "%"
