@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-// Import all route files
+// Import all routes file
 const recruiterAuthRoutes = require('./recruiter/auth_recruiter_routes');
 const userAuthRoutes = require('./user/auth_user_routes');
 const recruiterProfileRoutes = require('./recruiter/recruiter_profile_routes');

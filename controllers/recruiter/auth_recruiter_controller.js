@@ -140,6 +140,7 @@ const logout_recruiter = async (req, res, next) => {
     }
 };
 
+// export all functions
 
 module.exports = {
     register_recruiter,

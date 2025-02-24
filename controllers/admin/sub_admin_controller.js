@@ -116,6 +116,7 @@ const delete_sub_admin = async (req, res) => {
     }
 };
 
+// export all functions
 module.exports = {
     get_all_sub_admins,
     add_sub_admin,

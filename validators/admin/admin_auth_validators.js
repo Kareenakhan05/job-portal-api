@@ -75,6 +75,8 @@ const logout_admin_validator = [
     }
 ];
 
+//export all functions
+
 module.exports = {
     register_admin_validator,
     login_admin_validator,
