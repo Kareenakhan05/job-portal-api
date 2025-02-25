@@ -1,6 +1,6 @@
-const SubAdmin = require('../../models/sub_admin');
+const SubAdmin = require('../../../models/sub_admin');
 const bcrypt = require('bcryptjs');
-const { responseHandler } = require('../../helpers/response_helpers');
+const { responseHandler } = require('../../../helpers/response_helpers');
 
 // ✅ 1️⃣ Get All Sub-Admins (Search & Pagination)
 const get_all_sub_admins = async (req, res) => {

@@ -8,10 +8,10 @@ const {
     forgot_password, 
     reset_password,
     logout_user
-} = require("../../controllers/admin/admin_auth_controller.js");
+} = require("../../../controllers/dashboard/admin/admin_auth_controller.js");
 
 // Import Middlewares
-const validate_request = require("../../middlewares/validate_request.js");
+const validate_request = require("../../../middlewares/validate_request.js");
 
 // Import Validators
 const { 
@@ -20,7 +20,7 @@ const {
     forgot_password_validator, 
     reset_password_validator,
     logout_admin_validator 
-} = require('../../validators/admin/admin_auth_validators.js');
+} = require('../../../validators/dashboard/admin/admin_auth_validators.js');
 
 // ✅ Correct Middleware Usage
 router.post('/register', register_admin_validator, validate_request, register_admin);

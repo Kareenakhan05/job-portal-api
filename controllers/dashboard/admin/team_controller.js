@@ -1,5 +1,5 @@
-const Team = require('../../models/team_model');
-const { send_response } = require('../../helpers/response_helpers');
+const Team = require('../../../models/team_model');
+const { send_response } = require('../../../helpers/response_helpers');
 
 // ✅ Get All Team Members (With Filters & Pagination)
 const get_all_members = async (req, res) => {

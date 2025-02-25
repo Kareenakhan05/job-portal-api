@@ -1,5 +1,5 @@
-const Subscription = require('../../models/subscription'); // Subscription Model
-const responseMiddleware = require('../../middlewares/responseMiddleware'); // Response Helper
+const Subscription = require('../../../models/subscription'); // Subscription Model
+const responseMiddleware = require('../../../middlewares/responseMiddleware'); // Response Helper
 const { validationResult } = require('express-validator');
 
 // ✅ Create a new subscription plan (Admin Only)

@@ -10,13 +10,13 @@ const {
     edit_recruiter,
     add_admin_notes,
     delete_recruiter
-} = require('../../controllers/admin/manage_recruiters_controller');
+} = require('../../../controllers/dashboard/admin/manage_recruiters_controller');
 
 // ✅ Import Middlewares
 
-const { validate_id } = require('../../validators/admin/manage_recruiter_validators');
+const { validate_id } = require('../../../validators/dashboard/admin/manage_recruiter_validators');
 
-const { auth_middleware, verify_admin } = require('../../middlewares/auth_middleware');
+const { auth_middleware, verify_admin } = require('../../../middlewares/auth_middleware');
 
 // 🧑‍💻 Get all recruiters with filters & pagination
 router.get('/', auth_middleware, verify_admin, get_recruiters);

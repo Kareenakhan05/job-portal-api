@@ -1,5 +1,5 @@
-const Recruiter = require('../../models/recruiter');
-const responseHelper = require('../../helpers/response_helpers');
+const Recruiter = require('../../../models/recruiter');
+const responseHelper = require('../../../helpers/response_helpers');
 
 // ✅ GET: Fetch list of recruiters with pagination, filtering, sorting
 const get_recruiters = async (req, res) => {

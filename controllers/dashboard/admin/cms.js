@@ -1,5 +1,5 @@
-const CMS = require('../../models/cms');
-const { send_response } = require('../../middlewares/responseMiddleware');
+const CMS = require('../../../models/cms');
+const { send_response } = require('../../../middlewares/responseMiddleware');
 
 // ✅ Fetch CMS Content (Privacy Policy, Terms, About Us)
 const get_cms_content = async (req, res) => {

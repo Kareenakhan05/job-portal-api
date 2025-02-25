@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 
 // ✅ Import Controllers
-const { get_cms_content, update_cms_content } = require('../../controllers/admin/cms');
+const { get_cms_content, update_cms_content } = require('../../../controllers/dashboard/admin/cms');
 
 // ✅ Import Middleware
-const { auth_middleware, verify_admin } = require('../../middlewares/auth_middleware'); // ✅ Correct import
+const { auth_middleware, verify_admin } = require('../../../middlewares/auth_middleware'); // ✅ Correct import
 
 // ✅ CMS Management Routes
 

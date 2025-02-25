@@ -6,8 +6,8 @@ const {
     update_sub_admin_permissions, 
     view_sub_admin, 
     delete_sub_admin 
-} = require('../../controllers/admin/sub_admin_controller');
-const { auth_middleware, verify_admin } = require('../../middlewares/auth_middleware');
+} = require('../../../controllers/dashboard/admin/sub_admin_controller');
+const { auth_middleware, verify_admin } = require('../../../middlewares/auth_middleware');
 
 // Routes for Sub-Admin 
 router.get('/sub-admins', verify_admin, get_all_sub_admins);

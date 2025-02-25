@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { get_admin_overview, get_department_distribution } = require("../../controllers/admin/admin_dashboard_controller.js");
-const { validate_dashboard } = require("../../validators/admin/dashboard_validator.js");
+const { get_admin_overview, get_department_distribution } = require("../../../controllers/dashboard/admin/admin_dashboard_controller.js");
+const { validate_dashboard } = require("../../../validators/dashboard/admin/dashboard_validator.js");
 
 // ✅ Dashboard Overview
 router.get("/admin/overview", validate_dashboard, get_admin_overview);

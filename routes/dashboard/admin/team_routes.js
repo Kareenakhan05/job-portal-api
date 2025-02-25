@@ -9,11 +9,11 @@ const {
     update_member, 
     delete_member, 
     change_status 
-} = require('../../controllers/admin/team_controller');
+} = require('../../../controllers/dashboard/admin/team_controller');
 
 // ✅ Import Middlewares & Validator
-const { validate_team, validate_status, validate_id } = require('../../validators/admin/team_validator');
-const { auth_middleware, verify_admin } = require('../../middlewares/auth_middleware'); // ✅ Correct import
+const { validate_team, validate_status, validate_id } = require('../../../validators/dashboard/admin/team_validator');
+const { auth_middleware, verify_admin } = require('../../../middlewares/auth_middleware'); // ✅ Correct import
 
 // ✅ Team Management Routes
 

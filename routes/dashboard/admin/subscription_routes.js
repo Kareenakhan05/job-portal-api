@@ -8,11 +8,11 @@ const {
     get_subscription_by_id, 
     update_subscription, 
     delete_subscription 
-} = require('../../controllers/admin/subscription_controller');
+} = require('../../../controllers/dashboard/admin/subscription_controller');
 
 // ✅ Import Middleware & Validator
-const { validate_subscription } = require('../../validators/admin/subscription_validators');
-const { auth_middleware, verify_admin } = require('../../middlewares/auth_middleware'); // ✅ Correct import
+const { validate_subscription } = require('../../../validators/dashboard/admin/subscription_validators');
+const { auth_middleware, verify_admin } = require('../../../middlewares/auth_middleware'); // ✅ Correct import
 
 // ✅ Subscriptions Management Routes
 

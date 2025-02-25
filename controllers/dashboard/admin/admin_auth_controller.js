@@ -1,8 +1,8 @@
-const Admin = require('../../models/admin.js');
-const Recruiter = require('../../models/recruiter.js'); 
-const { generate_token, hash_password, compare_password } = require('../../helpers/auth_helpers.js');
-const { send_response } = require('../../helpers/response_helpers.js');
-const { sendOtp, verifyOtp } = require('../../services/otp_services.js');
+const Admin = require('../../../models/admin.js');
+const Recruiter = require('../../../models/recruiter.js'); 
+const { generate_token, hash_password, compare_password } = require('../../../helpers/auth_helpers.js');
+const { send_response } = require('../../../helpers/response_helpers.js');
+const { sendOtp, verifyOtp } = require('../../../services/otp_services.js');
 const { validationResult } = require('express-validator');
 
 // 🚀 Register Admin with OTP Verification
