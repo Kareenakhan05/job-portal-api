@@ -17,6 +17,7 @@ const cmsRoutes = require('./dashboard/admin/cms_routes');  // ✅ Added CMS Rou
 const subAdminRoutes = require('./dashboard/admin/sub_admin_routes'); // ✅ Added Sub-Admin Routes
 const recruiterDashboardRoutes = require('./dashboard/recruiter/recruiter_dashboard_routes');
 const recruitSectionRoutes = require('./dashboard/recruiter/recruit_section_routes'); // added recruit section routes
+const jobOpeningRoutes = require('./dashboard/recruiter/job_opening_routes'); // ✅ job_opening_routes
 
 // Assign routes with base paths
 router.use('/api/auth/recruiter', recruiterAuthRoutes);
@@ -34,6 +35,8 @@ router.use('/api/admin/cms', cmsRoutes);  // ✅ Integrated CMS Routes
 router.use('/api/admin/sub-admins', subAdminRoutes); // ✅ Integrated Sub-Admin Routes
 router.use('/api/recruiter/dashboard', recruiterDashboardRoutes);
 router.use('/recruit-section', recruitSectionRoutes); //Integrated recruit section routes
+router.use('/api/dashboard/recruiter/job-openings', jobOpeningRoutes); // ✅ Updated route
+
 
 
 
