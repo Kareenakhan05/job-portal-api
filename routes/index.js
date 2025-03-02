@@ -2,32 +2,30 @@ const express = require('express');
 const router = express.Router();
 
 // Import all routes file
-const recruiterAuthRoutes = require('./recruiter/auth_recruiter_routes');
-const userAuthRoutes = require('./user/auth_user_routes');
-const recruiterProfileRoutes = require('./recruiter/recruiter_profile_routes');
-const userProfileRoutes = require('./user/user_profile_routes');
-const userJobRoutes = require('./user/user_job_routes');
-const recruiterJobRoutes = require('./recruiter/recruiter_job_routes');
-const adminAuthRoutes = require('./dashboard/admin/admin_auth_routes');
-const adminDashboardRoutes = require('./dashboard/admin/admin_dashboard_routes');
-const manageRecruitersRoutes = require('./dashboard/admin/manage_recruiters_routes');
-const teamRoutes = require('./dashboard/admin/team_routes');
-const subscriptionRoutes = require('./dashboard/admin/subscription_routes');
-const cmsRoutes = require('./dashboard/admin/cms_routes');  // ✅ Added CMS Routes
-const subAdminRoutes = require('./dashboard/admin/sub_admin_routes'); // ✅ Added Sub-Admin Routes
-const recruiterDashboardRoutes = require('./dashboard/recruiter/recruiter_dashboard_routes');
-const recruitSectionRoutes = require('./dashboard/recruiter/recruit_section_routes'); // added recruit section routes
-const jobOpeningRoutes = require('./dashboard/recruiter/job_opening_routes'); // ✅ job_opening_routes
-const resumeRoutes = require('./dashboard/recruiter/resume_routes'); // resume routes
+
+const recruiterProfileRoutes = require('./recruiter/profile');
+const userProfileRoutes = require('./user/profile');
+const userJobRoutes = require('./user/job_management');
+const recruiterJobRoutes = require('./recruiter/job_management');
+const AuthRoutes = require('./admin/auth');
+const adminDashboardRoutes = require('./admin/dashboard');
+const manageRecruitersRoutes = require('./admin/manage_recruiters');
+const teamRoutes = require('./admin/team_management');
+const subscriptionRoutes = require('./admin/subscription');
+const cmsRoutes = require('./admin/cms');  // ✅ Added CMS Routes
+const subAdminRoutes = require('./admin/sub_admin'); // ✅ Added Sub-Admin Routes
+const recruiterDashboardRoutes = require('./admin/dashboard');
+const recruitSectionRoutes = require('./recruiter/recruit_section'); // added recruit section routes
+const jobOpeningRoutes = require('./recruiter/job_opening'); // ✅ job_opening_routes
+const resumeRoutes = require('./recruiter/resume'); // resume routes
 
 // Assign routes with base paths
-router.use('/api/auth/recruiter', recruiterAuthRoutes);
-router.use('/api/auth/user', userAuthRoutes);
+
 router.use('/api/recruiter/profile', recruiterProfileRoutes);
 router.use('/api/user/profile', userProfileRoutes);
 router.use('/api/user/jobs', userJobRoutes);
 router.use('/api/recruiter/jobs', recruiterJobRoutes);
-router.use('/api/admin/auth', adminAuthRoutes);
+router.use('/api/auth', AuthRoutes);
 router.use('/api/admin/dashboard', adminDashboardRoutes);
 router.use('/api/admin/recruiters', manageRecruitersRoutes);
 router.use('/api/admin/team', teamRoutes);
